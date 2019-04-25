@@ -54,7 +54,11 @@ using namespace Garfield;
 
 #define VIEW_EVE 1
 #define ALPHA_TRACK 1
+#define SAVE_FILE 1
+#ifndef SAVE_FILE
 //#define DRAW_ARROW 1
+//#define DRAW_CANVAS 1
+#endif
 //#define BEAM_TRACK 1
 //#define ORIGINAL_DRIFT 1
 //#define ONE_ELE 1
@@ -172,12 +176,23 @@ int main(int argc, char *argv[]){
   TH2D *h_cathode = new TH2D("h_cathode","h_cathode",256,0.,256.,1024,0.,1024.);
   TH2D *h_raw_anode = new TH2D("h_raw_anode","h_raw_anode",256,0.,256.,1024,0.,1024.);
   TH2D *h_raw_cathode = new TH2D("h_raw_cathode","h_raw_cathode",256,0.,256.,1024,0.,1024.);
+#ifdef DRAW_CANVAS
   TCanvas *c1 = new TCanvas("c1");
   TCanvas *c2 = new TCanvas("c2");
   TCanvas *c3 = new TCanvas("c3");
   TCanvas *c4 = new TCanvas("c4");
+#endif
+#ifdef DRAW_ARROW
   TArrow ar_anode[3];
   TArrow ar_cathode[3];
+#endif
+#ifdef SAVE_FILE
+  std::string tempname = FILENAME+"tpc.dat";
+  FILE *file_tpc = fopen(tempname.c_str(),"w");
+  tempname = FILENAME+"para.dat";
+  FILE *file_para = fopen(tempname.c_str(),"w");
+#endif
+
   
   ///////////////////////////
   //   garfield settings   //
@@ -369,6 +384,34 @@ int main(int argc, char *argv[]){
   }
   clear_tpc_data(tpc_data);  
 
+#ifdef SAVE_FILE
+//****  char branch[1024];
+//****  tree->Branch("h_anode","TH2D",h_anode,128000,0);
+//****  tree->Branch("h_cathode","TH2D",h_cathode,128000,0);
+//****  tree->Branch("h_raw_anode","TH2D",h_raw_anode,128000,0);
+//****  tree->Branch("h_raw_cathode","TH2D",h_raw_cathode,128000,0);
+//****  tree->Branch("raw_wave",raw_wave,"raw_wave/D");
+//****  tree->Branch("fadc_data",fadc_data,"fadc_data/I");
+//****  tree->Branch("tpc_data",tpc_data,"tpc_data/I");
+//****  sprintf(branch,"recoil_track_a_x[%d][2]/D",nAlpha);
+//****  tree->Branch("recoil_track_a_x",recoil_track_a_x,branch);
+//****  sprintf(branch,"recoil_track_a_y[%d][2]/D",nAlpha);
+//****  tree->Branch("recoil_track_a_y",recoil_track_a_y,branch);
+//****  sprintf(branch,"recoil_track_c_x[%d][2]/D",nAlpha);
+//****  tree->Branch("recoil_track_c_x",recoil_track_c_x,branch);
+//****  sprintf(branch,"recoil_track_c_y[%d][2]/D",nAlpha);
+//****  tree->Branch("recoil_track_c_y",recoil_track_c_y,branch);
+//****  sprintf(branch,"theta3_deg[%d]/D",nAlpha);
+//****  tree->Branch("theta3_deg",theta3_deg,branch);
+//****  sprintf(branch,"phi3_deg[%d]/D",nAlpha);
+//****  tree->Branch("phi3_deg",phi3_deg,branch);
+//****  sprintf(branch,"e3[%d]/D",nAlpha);
+//****  tree->Branch("e3",e3,branch);
+//****  sprintf(branch,"dr[%d]/D",nAlpha);
+//****  tree->Branch("dr",dr,branch);
+#endif
+  
+  
   /* wave template data */
   char wavefname[512];
   sprintf(wavefname, "%s/tables/wave_temp.dat", workdir);
@@ -422,13 +465,13 @@ int main(int argc, char *argv[]){
     vtx_x = rndm->Gaus(VTX_X_MEAN, VTX_X_SIGMA);
     vtx_y = rndm->Gaus(VTX_Y_MEAN, VTX_Y_SIGMA);  
     vtx_z = rndm->Uniform(VTX_Z_START, VTX_Z_STOP);
-
+    
     int alpha_inside = 0;
-
+    
     clear_raw_wave(raw_wave);
     clear_fadc_data(fadc_data);	    
     clear_tpc_data(tpc_data);
-
+    
     for(int i_alpha=0;i_alpha<nAlpha;i_alpha++){
       theta3_rad[i_alpha] = alpha[i_alpha].Theta();
       phi3_rad[i_alpha] = alpha[i_alpha].Phi();
@@ -436,7 +479,7 @@ int main(int argc, char *argv[]){
       phi3_deg[i_alpha] = phi3_rad[i_alpha]*(TMath::RadToDeg());
       //    printf("Ex2=%f, theta3=%.2f\n", Ex2, theta3_deg);
       e3[i_alpha] = (alpha[i_alpha].E()-M_alpha)*MeV;
-            
+      
       range[i_alpha] = gr_range->Eval(e3[i_alpha]);
       range_rec[i_alpha] = range[i_alpha] + rndm->Gaus(0, RANGE_RESO);
       e3_rec[i_alpha] = gr_ene->Eval(range_rec[i_alpha]);
@@ -530,13 +573,13 @@ int main(int argc, char *argv[]){
 	
 	/* get cluster position of recoil alpha */
 	tot_ne=0;
-
+	
 	bool first_flag = true;
 	double vtx_drift_time;
 	
 	while(srim_alpha->GetCluster(cluster_pos[1], cluster_pos[2], cluster_pos[3],
 				     cluster_pos[0],
-			     ne, ec, ekin)){
+				     ne, ec, ekin)){
 	  
 	  n_cluster++;
 	  tot_ne+=ne;
@@ -568,7 +611,7 @@ int main(int argc, char *argv[]){
 					   ele_end_pos[0],
 					   drift_status);
 		drift_time = (ele_end_pos[0]-cluster_pos[0]);
-//****		drift_time = ele_end_pos[0]-trig_time;
+		//****		drift_time = ele_end_pos[0]-trig_time;
 		add_raw_wave2(ele_end_pos, drift_time, add_ele,
 			      wave_spline, GAS_GAIN, raw_wave);
 		if(first_flag){
@@ -595,7 +638,7 @@ int main(int argc, char *argv[]){
 #endif
 	  } // end of while(ie<ne)
 	} // end of alpha cluster loop
-
+	
 	recoil_track_a_x[i_alpha][0] = vtx_z*N_STRP/TPC_SIZE;
 	recoil_track_a_y[i_alpha][0] = (vtx_drift_time+BUFF_TIME)*SAMPLING_RATIO; // mm*ns/mm = ns/freq(GHz) = ch
 	recoil_track_c_x[i_alpha][0] = vtx_x*N_STRP/TPC_SIZE;
@@ -605,7 +648,7 @@ int main(int argc, char *argv[]){
 	recoil_track_a_y[i_alpha][1] = (drift_time+BUFF_TIME)*SAMPLING_RATIO;
 	recoil_track_c_x[i_alpha][1] = cluster_pos[1]*cmTomm*N_STRP/TPC_SIZE;
 	recoil_track_c_y[i_alpha][1] = (drift_time+BUFF_TIME)*SAMPLING_RATIO;
-	
+#ifdef DRAW_ARROW
 	ar_anode[i_alpha] = TArrow(recoil_track_a_x[i_alpha][0],recoil_track_a_y[i_alpha][0],
 				   recoil_track_a_x[i_alpha][1],recoil_track_a_y[i_alpha][1],0.01,"|>");
 	ar_cathode[i_alpha] = TArrow(recoil_track_c_x[i_alpha][0],recoil_track_c_y[i_alpha][0],
@@ -616,6 +659,7 @@ int main(int argc, char *argv[]){
 	ar_cathode[i_alpha].SetFillColor(kRed);
 	ar_anode[i_alpha].SetLineWidth(3);
 	ar_cathode[i_alpha].SetLineWidth(3);
+#endif
 
 	
 //****	printf("theta=%.1f, e3=%.2f MeV, phi=%.1f, range=%.1f, cluster num=%d, tot_ne=%d\n",
@@ -661,60 +705,98 @@ int main(int argc, char *argv[]){
 	  h_raw_cathode->SetBinContent(str_id,clk_id,raw_wave[1][clk_id][str_id]);
 	}
       }
-      TFile *tfile = new TFile("temp.root","recreate");
+#ifdef DRAW_CANVAS
       c1->cd();
       c1->Clear();
       h_raw_anode->Draw("colz");
+#endif
 #ifdef DRAW_ARROW
       for(Int_t i_alpha=0;i_alpha<nAlpha;i_alpha++){
 	ar_anode[i_alpha].Draw();
       }
 #endif
+#ifdef DRAW_CANVAS
       c1->Update();
       c2->cd();
       c2->Clear();
       h_raw_cathode->Draw("colz");
+#endif
 #ifdef DRAW_ARROW
       for(Int_t i_alpha=0;i_alpha<nAlpha;i_alpha++){
 	ar_cathode[i_alpha].Draw();
       }
 #endif
+#ifdef DRAW_CANVAS
       c2->Update();
       c3->cd();
       c3->Clear();
       h_anode->Draw("box");
+#endif
 #ifdef DRAW_ARROW
       for(Int_t i_alpha=0;i_alpha<nAlpha;i_alpha++){
 	ar_anode[i_alpha].Draw();
       }
 #endif
+#ifdef DRAW_CANVAS
       c3->Update();
       c4->cd();
       c4->Clear();
       h_cathode->Draw("box");
+#endif
 #ifdef DRAW_ARROW
       for(Int_t i_alpha=0;i_alpha<nAlpha;i_alpha++){
 	ar_cathode[i_alpha].Draw();
       }
 #endif
+#ifdef DRAW_CANVAS
       c4->Update();
       std::cout << "update" << std::endl;
       h_raw_anode->Write();
       h_raw_cathode->Write();
       h_anode->Write();
       h_cathode->Write();
-      tfile->Close();
-      delete tfile;
-      while(getchar() != '\n');
+      if(getchar() == 'q') return 0;
+#endif
+#ifdef SAVE_FILE
+//****      tree->Fill();
+      for(int a=0;a<N_AC;a++){
+	for(int b=0;b<N_TCLK;b++){
+	  for(int c=0;c<N_STRP;b++){
+	    fprintf(file_tpc,"%d ",tpc_data[a][b][c]);
+	  }
+	}
+      }
+      fprintf(file_tpc,"\n");
+      for(int i_alpha=0;i_alpha<nAlpha;i_alpha++){
+	for(int a=0;a<2;a++){
+	  fprintf(file_para,"%f ",recoil_track_a_x[i_alpha][a]);
+	  fprintf(file_para,"%f ",recoil_track_a_y[i_alpha][a]);
+	  fprintf(file_para,"%f ",recoil_track_c_x[i_alpha][a]);
+	  fprintf(file_para,"%f ",recoil_track_c_y[i_alpha][a]);
+	}
+	fprintf(file_para,"%f ",e3[i_alpha]);
+	fprintf(file_para,"%f ",theta3_deg[i_alpha]);
+	fprintf(file_para,"%f ",phi3_deg[i_alpha]);
+	fprintf(file_para,"%f ",dr[i_alpha]);
+      }
+#endif
       h_anode->Reset();
       h_cathode->Reset();
       h_raw_anode->Reset();
       h_raw_cathode->Reset();
-    
+      
+      
       ii++;
     }  // end of if(alpha_inside...)
   }  // end of ii loop
-    
+#ifdef SAVE_FILE
+//****  tree->Write();
+//****  tfile->Close();
+//****  delete tfile;
+  fclose(file_tpc);
+  fclose(file_para);
+#endif
+  
   //      printf("theta=%.2f, e3=%.2f, eff=%.4f\n", theta3_deg, e3, stop_eff);
   stop_eff = stop_cnt/((double)total_cnt);
   
@@ -725,7 +807,9 @@ int main(int argc, char *argv[]){
 //****    fclose(fp_t[ii]);
 //****    fclose(fp_r[ii]);
 //****  }
+#ifndef SAVE_FILE
   app.Run();
+#endif
   
   ///////////////////////////////
   //   release memory
