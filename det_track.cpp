@@ -709,44 +709,44 @@ int main(int argc, char *argv[]){
       c1->cd();
       c1->Clear();
       h_raw_anode->Draw("colz");
-#endif
 #ifdef DRAW_ARROW
       for(Int_t i_alpha=0;i_alpha<nAlpha;i_alpha++){
 	ar_anode[i_alpha].Draw();
       }
+#endif
 #endif
 #ifdef DRAW_CANVAS
       c1->Update();
       c2->cd();
       c2->Clear();
       h_raw_cathode->Draw("colz");
-#endif
 #ifdef DRAW_ARROW
       for(Int_t i_alpha=0;i_alpha<nAlpha;i_alpha++){
 	ar_cathode[i_alpha].Draw();
       }
+#endif
 #endif
 #ifdef DRAW_CANVAS
       c2->Update();
       c3->cd();
       c3->Clear();
       h_anode->Draw("box");
-#endif
 #ifdef DRAW_ARROW
       for(Int_t i_alpha=0;i_alpha<nAlpha;i_alpha++){
 	ar_anode[i_alpha].Draw();
       }
+#endif
 #endif
 #ifdef DRAW_CANVAS
       c3->Update();
       c4->cd();
       c4->Clear();
       h_cathode->Draw("box");
-#endif
 #ifdef DRAW_ARROW
       for(Int_t i_alpha=0;i_alpha<nAlpha;i_alpha++){
 	ar_cathode[i_alpha].Draw();
       }
+#endif
 #endif
 #ifdef DRAW_CANVAS
       c4->Update();
@@ -761,7 +761,7 @@ int main(int argc, char *argv[]){
 //****      tree->Fill();
       for(int a=0;a<N_AC;a++){
 	for(int b=0;b<N_TCLK;b++){
-	  for(int c=0;c<N_STRP;b++){
+	  for(int c=0;c<N_STRP;c++){
 	    fprintf(file_tpc,"%d ",tpc_data[a][b][c]);
 	  }
 	}
@@ -779,6 +779,7 @@ int main(int argc, char *argv[]){
 	fprintf(file_para,"%f ",phi3_deg[i_alpha]);
 	fprintf(file_para,"%f ",dr[i_alpha]);
       }
+      fprintf(file_para,"\n");
 #endif
       h_anode->Reset();
       h_cathode->Reset();

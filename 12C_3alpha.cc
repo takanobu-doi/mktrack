@@ -55,7 +55,7 @@ int decay12C(std::vector<TLorentzVector> *decay_alpha,int flag)
   TLorentzVector beam(0.0,0.0,Pz_beam,E_beam);
   TLorentzVector target(0.0,0.0,0.0,M_12C);
   TLorentzVector W = beam+target;
-  Double_t masses1[2] = {M_12C/MeV,M_n};
+  Double_t masses1[2] = {M_12C,M_n};
 
   TGenPhaseSpace *event = new TGenPhaseSpace();
   switch(flag){
