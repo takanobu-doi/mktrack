@@ -2,7 +2,7 @@
 *.root
 *.dat
 tables
-tables.org
+*.org
 root
 batch
 macro
