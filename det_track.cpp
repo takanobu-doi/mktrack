@@ -147,7 +147,7 @@ int main(int argc, char *argv[]){
   int stop_cnt;     // number of stop inside TPC event for each (theta,e3)
   double stop_eff;  // ratio of the stop_cnt/total_cnt
   int neve;         // number of total generated event
-
+  
   /* garfield parameters */
   double cluster_pos[4];
   double ele_end_pos[4];  
