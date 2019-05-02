@@ -1,0 +1,10 @@
+*.o
+*.root
+*.dat
+tables
+tables.org
+root
+batch
+macro
+det_track
+*~
