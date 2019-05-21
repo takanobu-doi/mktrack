@@ -121,19 +121,31 @@ int main(int argc, char *argv[]){
 //****  sprintf(enelossfname_alpha, "%s/tables/eneloss_alpha_%d.dat", workdir, press);
 //****  TGraph *gr_eneloss_alpha = new TGraph(enelossfname_alpha);
   
-  TLorentzVector alpha[nAlpha];
-  double phi3_deg[nAlpha];
-  double phi3_rad[nAlpha];     // recoil phi angle (radian)
-  double theta3_deg[nAlpha];
-  double theta3_rad[nAlpha];   // recoil angle in LAB (radian)  
-  double e3[nAlpha];           // recoil energy in LAB (MeV)
-  double e3_rec[nAlpha];       // reconstructed recoil energy with finite resolution in LAB (MeV)  
-  double range[nAlpha];        // recoil range (mm)
-  double range_rec[nAlpha];    // reconstructed recoil range with finite resolution (mm)  
+//  TLorentzVector alpha[nAlpha];
+  std::vector<TLorentzVector> alpha;
+//  double phi3_deg[nAlpha];
+  std::vector<double> phi3_deg;
+//  double phi3_rad[nAlpha];     // recoil phi angle (radian)
+  std::vector<double> phi3_rad;
+//  double theta3_deg[nAlpha];
+  std::vector<double> theta3_deg;
+//  double theta3_rad[nAlpha];   // recoil angle in LAB (radian)  
+  std::vector<double> theta3_rad;
+// double e3[nAlpha];           // recoil energy in LAB (MeV)
+  std::vector<double> e3;
+//  double e3_rec[nAlpha];       // reconstructed recoil energy with finite resolution in LAB (MeV)  
+  std::vector<double> e3_rec;
+//  double range[nAlpha];        // recoil range (mm)
+  std::vector<double> range;
+//  double range_rec[nAlpha];    // reconstructed recoil range with finite resolution (mm)  
+  std::vector<double> range_rec;
   double vtx_x,vtx_y,vtx_z;     // vertex position (mm)
-  double dx[nAlpha],dy[nAlpha],dz[nAlpha];              // position difference between vertex and stop points
-  double dr[nAlpha];
-  double stop_x[nAlpha],stop_y[nAlpha],stop_z[nAlpha];  // recoil particle stop position (mm)
+//  double dx[nAlpha],dy[nAlpha],dz[nAlpha];              // position difference between vertex and stop points
+  std::vector<double> dx, dy, dz;
+//  double dr[nAlpha];
+  std::vector<double> dr;
+//  double stop_x[nAlpha],stop_y[nAlpha],stop_z[nAlpha];  // recoil particle stop position (mm)
+  std::vector<double> stop_x, stop_y, stop_z;
   double ex;                    // excitation energy of 10C
   double theta_cm;              // angle in center of mass
 
